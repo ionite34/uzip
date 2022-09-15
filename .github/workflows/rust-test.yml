@@ -23,7 +23,7 @@ jobs:
           command: check
 
   test:
-    name: Rust Tests
+    name: Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
