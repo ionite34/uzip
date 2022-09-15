@@ -192,7 +192,6 @@ fn uzip(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(z_dict_compress, m)?)?;
     m.add_function(wrap_pyfunction!(b_compress, m)?)?;
     m.add_function(wrap_pyfunction!(z_encode, m)?)?;
-    m.add_function(wrap_pyfunction!(encode, m)?)?;
 
     // Add exceptions
     m.add("EncodingError", _py.get_type::<EncodingError>())?;
