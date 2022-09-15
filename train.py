@@ -15,6 +15,12 @@ REPOS = [
     "https://github.com/psf/black",
     # Numpy: BSD 3-Clause
     "https://github.com/numpy/numpy",
+    # Attrs: MIT
+    "https://github.com/python-attrs/attrs",
+    # Click: BSD 3-Clause
+    "https://github.com/pallets/click",
+    # PyO3: Apache 2.0
+    "https://github.com/PyO3/pyo3",
 ]
 
 
@@ -54,11 +60,16 @@ class Trainer:
             name = repo.split('/')[-1]
             path = self.path / name
             print(f"Training [{name}]...")
-            files = tqdm(list(path.rglob('**/*.py')))
+            # files = tqdm(list(path.rglob('**/*.py')))
+            files = tqdm(
+                p.resolve() for p in Path(path).glob("**/*")
+                if p.suffix in {".py", ".c", ".cpp", ".h", ".rs", ".js", ".toml", ".ini"}
+            )
             for file in files:
                 files.set_description(file.name)
                 with open(file, 'rb') as f:
-                    data = f.read(self.file_max)
+                    # data = f.read(self.file_max)
+                    data = f.read()
                 yield data
 
 
