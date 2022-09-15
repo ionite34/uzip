@@ -2,7 +2,6 @@
 // use base_encode::{encode, decode, to_string};
 // use base64;
 
-mod encoding;
 mod compression;
 
 use std::io;
@@ -22,12 +21,6 @@ use pyo3::exceptions::PyValueError;
 // Define exceptions
 create_exception!(uzip, EncodingError, PyValueError);
 create_exception!(uzip, DecodeError, PyValueError);
-
-
-#[pyfunction]
-fn encode(data: &[u8]) -> PyResult<String> {
-    Ok(encoding::encode(data))
-}
 
 /// Accepts python `bytes` and returns a compressed version of it.
 #[pyfunction]
