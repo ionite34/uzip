@@ -3,7 +3,6 @@
 from pathlib import Path
 
 from git import Repo, RemoteProgress
-from glob import glob
 from tqdm import tqdm
 from pyzstd import train_dict, finalize_dict
 
@@ -21,6 +20,12 @@ REPOS = [
     "https://github.com/pallets/click",
     # PyO3: Apache 2.0
     "https://github.com/PyO3/pyo3",
+    # Httpx: BSD 3-Clause
+    "https://github.com/encode/httpx",
+    # Pytest: MIT
+    "https://github.com/pytest-dev/pytest",
+    # Pandas: BSD 3-Clause
+    "https://github.com/pandas-dev/pandas",
 ]
 
 
@@ -49,7 +54,7 @@ class Trainer:
             name = repo.split('/')[-1]
             path = self.path / name
             if not path.exists():
-                Repo.clone_from(repo, path, progress=CloneProgress())
+                Repo.clone_from(repo, path, progress=CloneProgress())  # type: ignore
             else:
                 repo = Repo(path)
                 repo.remotes.origin.pull(progress=CloneProgress())
