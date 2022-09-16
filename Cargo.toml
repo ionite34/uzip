@@ -2,6 +2,7 @@
 name = "uzip"
 version = "0.1.0"
 edition = "2021"
+exclude = ["/dist"]
 
 [lib]
 name = "uzip"
