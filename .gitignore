@@ -18,6 +18,8 @@ Cargo.lock
 *.pdb
 
 # -- Python --
+# Builds
+dist/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
