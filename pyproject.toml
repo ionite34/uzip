@@ -7,16 +7,26 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 
-[dependencies]
+dependencies = [
+    "python-minifier >= 2.6.0"
+]
 
 [project.optional-dependencies]
 dev = [
     "pytest",
-    "pytest-cov[all]",
+    "pytest-cov",
     "tqdm >= 4.64.1",
+    "rich >= 12.5.1",
     "pyzstd >= 0.15.3",
     "GitPython >= 3.1.20",
 ]
+
+profile = [
+    "ipython",
+]
+
+[tool.maturin]
+python-source = "src-py"
 
 [build-system]
 requires = ["maturin>=0.13,<0.14"]

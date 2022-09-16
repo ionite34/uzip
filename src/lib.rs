@@ -5,13 +5,9 @@
 mod compression;
 
 use std::io;
-use std::io::{Cursor, Error};
-use std::path::Path;
+use std::io::{Cursor};
 use brotli::enc::backward_references::BrotliEncoderMode;
-use miniz_oxide::deflate::compress_to_vec;
-use miniz_oxide::inflate::decompress_to_vec;
 use brotli::enc::BrotliEncoderParams;
-use brotli::enc::encode::BrotliEncoderParameter;
 
 use pyo3::create_exception;
 use pyo3::prelude::*;
@@ -23,7 +19,7 @@ create_exception!(uzip, EncodingError, PyValueError);
 create_exception!(uzip, DecodeError, PyValueError);
 
 /// Accepts python `bytes` and returns a compressed version of it.
-#[pyfunction]
+#[pyfunction(level="9")]
 fn compress(data: &[u8], level: usize) -> PyResult<PyObject> {
     let res = match compression::compress(data, level) {
         Ok(x) => {x}
@@ -70,9 +66,9 @@ fn b_compress(data: &[u8]) -> PyResult<PyObject> {
     let mut compressed = Vec::new();
 
     let mut params = BrotliEncoderParams::default();
-    params.quality = 5;
+    params.quality = 7;
     params.large_window = true;
-    params.mode = BrotliEncoderMode::BROTLI_MODE_TEXT;
+    params.mode = BrotliEncoderMode::BROTLI_MODE_GENERIC;
 
 
     match brotli::BrotliCompress(&mut buffer, &mut compressed, &params) {
@@ -161,33 +157,15 @@ fn b2048decode(s: &str) -> PyResult<PyObject> {
     Ok(bytes)
 }
 
-#[pyfunction]
-fn b65536encode(s: &[u8]) -> PyResult<String> {
-    Ok(base65536::encode(s, None))
-}
-
-#[pyfunction]
-fn b65536decode(s: &str) -> PyResult<PyObject> {
-    let result = match base65536::decode(s, false) {
-        Ok(x) => x,
-        Err(e) => return Err(DecodeError::new_err(format!("{:?}", e))),
-    };
-    let bytes = Python::with_gil(|py| {
-        PyBytes::new(py, &result).into()
-    });
-    Ok(bytes)
-}
-
 /// A Python module implemented in Rust.
 #[pymodule]
 fn uzip(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(b2048encode, m)?)?;
     m.add_function(wrap_pyfunction!(b2048decode, m)?)?;
-    m.add_function(wrap_pyfunction!(b65536encode, m)?)?;
-    m.add_function(wrap_pyfunction!(b65536decode, m)?)?;
 
     m.add_function(wrap_pyfunction!(compress, m)?)?;
     m.add_function(wrap_pyfunction!(decompress, m)?)?;
+
     m.add_function(wrap_pyfunction!(z_compress, m)?)?;
     m.add_function(wrap_pyfunction!(z_dict_compress, m)?)?;
     m.add_function(wrap_pyfunction!(b_compress, m)?)?;

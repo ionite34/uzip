@@ -3,21 +3,19 @@ name = "uzip"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
 name = "uzip"
 crate-type = ["cdylib"]
 
 [dependencies]
 brotli = ">=3.3.4"
-base-encode = ">=0.3.1"
-base64 = ">=0.13.0"
-lz4_flex = "^0.9.5"
 miniz_oxide = ">=0.6.2"
 base2048 = "^2.0.2"
-base65536 = "^1.0.1"
-zstd = { version=">=0.11.2", features=["zdict_builder", "zstdmt"]}
+zstd = { version=">=0.11.2", features=["zdict_builder", "zstdmt"] }
 walkdir = ">=2.3.2"
+
+[package.metadata.maturin]
+python-source = "src-py"
 
 [dependencies.pyo3]
 version = "0.17.1"

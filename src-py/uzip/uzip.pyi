@@ -1,8 +1,4 @@
 """Unicode Text Compression and Encoding"""
-# import base64
-
-# x = base64.b64encode("Hello World")
-# y = base64.b64decode(x)
 
 
 def b2048encode(s: bytes) -> str:
@@ -15,8 +11,6 @@ def b2048encode(s: bytes) -> str:
     Returns:
         str: Encoded string.
     """
-    ...
-
 
 def b2048decode(s: str) -> bytes:
     """
@@ -28,33 +22,8 @@ def b2048decode(s: str) -> bytes:
     Returns:
         bytes: Decoded bytes.
     """
-    ...
 
-def b65536encode(s: bytes) -> str:
-    """
-    Encode a bytes-like object s using Base65536 and returns a string.
-
-    Args:
-        s: Bytes-like object to encode.
-
-    Returns:
-        str: Encoded string.
-    """
-    ...
-
-def b65536decode(s: str) -> bytes:
-    """
-    Decodes a bytes-like object or ASCII string s using Base65536.
-
-    Args:
-        s: Bytes-like or str object to decode.
-
-    Returns:
-        bytes: Decoded bytes.
-    """
-    ...
-
-def compress(data: bytes, level: int) -> bytes:
+def compress(data: bytes, level: int = 9) -> bytes:
     """
     Compress a bytes-like object data using zstd.
 
@@ -65,7 +34,6 @@ def compress(data: bytes, level: int) -> bytes:
     Returns:
         bytes: Compressed bytes.
     """
-    ...
 
 def decompress(data: bytes) -> bytes:
     """
@@ -77,4 +45,3 @@ def decompress(data: bytes) -> bytes:
     Returns:
         bytes: Decompressed bytes.
     """
-    ...

@@ -4,13 +4,12 @@ use std::io::{Cursor, Error};
 // Include compression dict
 const DICT: &[u8] = include_bytes!("./dict.bin");
 
-
 pub fn compress(data: &[u8], level: usize) -> Result<Vec<u8>, Error> {
     let mut compressed = Vec::new();
     let mut encoder = zstd::Encoder::with_dictionary(
         &mut compressed, level as i32, DICT
     ).unwrap();
-    encoder.multithread(10).unwrap();
+    // encoder.multithread(10).unwrap();
 
     let mut cur = Cursor::new(data);
 
