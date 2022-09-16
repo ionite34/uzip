@@ -139,9 +139,9 @@ fn b2048decode(s: &str) -> PyResult<PyObject> {
     let result = match base2048::decode(s) {
         Some(x) => x,
         None => {
-            return Err(DecodeError::new_err(format!(
-                "Could not decode bytes as valid base-2048"
-            )))
+            return Err(DecodeError::new_err(
+                "Could not decode bytes as valid base-2048",
+            ))
         }
     };
     let bytes = Python::with_gil(|py| PyBytes::new(py, &result).into());
