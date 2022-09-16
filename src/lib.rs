@@ -4,30 +4,28 @@
 
 mod compression;
 
-use std::io;
-use std::io::{Cursor};
 use brotli::enc::backward_references::BrotliEncoderMode;
 use brotli::enc::BrotliEncoderParams;
+use std::io;
+use std::io::Cursor;
 
 use pyo3::create_exception;
+use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
-use pyo3::exceptions::PyValueError;
 
 // Define exceptions
 create_exception!(uzip, EncodingError, PyValueError);
 create_exception!(uzip, DecodeError, PyValueError);
 
 /// Accepts python `bytes` and returns a compressed version of it.
-#[pyfunction(level="9")]
+#[pyfunction(level = "9")]
 fn compress(data: &[u8], level: usize) -> PyResult<PyObject> {
     let res = match compression::compress(data, level) {
-        Ok(x) => {x}
-        Err(e) => return Err(EncodingError::new_err(format!("Error {:?}", e)))
+        Ok(x) => x,
+        Err(e) => return Err(EncodingError::new_err(format!("Error {:?}", e))),
     };
-    let result = Python::with_gil(|py| {
-        PyBytes::new(py, &res).into()
-    });
+    let result = Python::with_gil(|py| PyBytes::new(py, &res).into());
     Ok(result)
 }
 
@@ -35,12 +33,10 @@ fn compress(data: &[u8], level: usize) -> PyResult<PyObject> {
 #[pyfunction]
 fn decompress(data: &[u8]) -> PyResult<PyObject> {
     let res = match compression::decompress(data) {
-        Ok(x) => {x}
-        Err(e) => return Err(DecodeError::new_err(e))
+        Ok(x) => x,
+        Err(e) => return Err(DecodeError::new_err(e)),
     };
-    let result = Python::with_gil(|py| {
-        PyBytes::new(py, &res).into()
-    });
+    let result = Python::with_gil(|py| PyBytes::new(py, &res).into());
     Ok(result)
 }
 
@@ -48,14 +44,12 @@ fn decompress(data: &[u8]) -> PyResult<PyObject> {
 fn z_compress(data: &[u8]) -> PyResult<PyObject> {
     let mut compressed = Vec::new();
 
-    match zstd::stream::copy_encode(data,&mut compressed, 0) {
-        Ok(_) => {},
+    match zstd::stream::copy_encode(data, &mut compressed, 0) {
+        Ok(_) => {}
         Err(e) => return Err(EncodingError::new_err(format!("Error {:?}", e))),
     }
 
-    let result = Python::with_gil(|py| {
-        PyBytes::new(py, &compressed).into()
-    });
+    let result = Python::with_gil(|py| PyBytes::new(py, &compressed).into());
 
     Ok(result)
 }
@@ -70,15 +64,12 @@ fn b_compress(data: &[u8]) -> PyResult<PyObject> {
     params.large_window = true;
     params.mode = BrotliEncoderMode::BROTLI_MODE_GENERIC;
 
-
     match brotli::BrotliCompress(&mut buffer, &mut compressed, &params) {
-        Ok(_) => {},
+        Ok(_) => {}
         Err(e) => return Err(EncodingError::new_err(format!("Error {:?}", e))),
     }
 
-    let result = Python::with_gil(|py| {
-        PyBytes::new(py, &compressed).into()
-    });
+    let result = Python::with_gil(|py| PyBytes::new(py, &compressed).into());
 
     Ok(result)
 }
@@ -98,16 +89,14 @@ fn z_dict_compress(data: &[u8]) -> PyResult<PyObject> {
 
     let mut cur = Cursor::new(data);
 
-    match io::copy(&mut cur,&mut encoder) {
-        Ok(_) => {},
+    match io::copy(&mut cur, &mut encoder) {
+        Ok(_) => {}
         Err(e) => return Err(EncodingError::new_err(format!("Error {:?}", e))),
     }
 
     encoder.finish().unwrap();
 
-    let result = Python::with_gil(|py| {
-        PyBytes::new(py, &compressed).into()
-    });
+    let result = Python::with_gil(|py| PyBytes::new(py, &compressed).into());
 
     Ok(result)
 }
@@ -120,7 +109,7 @@ fn z_encode(data: &[u8]) -> PyResult<String> {
     let sum_sizes = sizes.iter().sum::<usize>();
     sizes[6] += data.len() - sum_sizes;
     let dict = match zstd::dict::from_continuous(data, &sizes, data.len()) {
-        Ok(x) => {x}
+        Ok(x) => x,
         Err(e) => return Err(EncodingError::new_err(format!("Error {:?}", e))),
     };
 
@@ -128,8 +117,8 @@ fn z_encode(data: &[u8]) -> PyResult<String> {
     let mut encoder = zstd::Encoder::with_dictionary(Vec::new(), 21, &dict).unwrap();
     encoder.multithread(10).unwrap();
 
-    match zstd::stream::copy_encode(data,&mut compressed, 21) {
-        Ok(_) => {},
+    match zstd::stream::copy_encode(data, &mut compressed, 21) {
+        Ok(_) => {}
         Err(e) => return Err(EncodingError::new_err(format!("Error {:?}", e))),
     }
 
@@ -149,11 +138,13 @@ fn b2048encode(s: &[u8]) -> PyResult<String> {
 fn b2048decode(s: &str) -> PyResult<PyObject> {
     let result = match base2048::decode(s) {
         Some(x) => x,
-        None => return Err(DecodeError::new_err(format!("Could not decode bytes as valid base-2048"))),
+        None => {
+            return Err(DecodeError::new_err(format!(
+                "Could not decode bytes as valid base-2048"
+            )))
+        }
     };
-    let bytes = Python::with_gil(|py| {
-        PyBytes::new(py, &result).into()
-    });
+    let bytes = Python::with_gil(|py| PyBytes::new(py, &result).into());
     Ok(bytes)
 }
 
