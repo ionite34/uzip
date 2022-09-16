@@ -4,7 +4,6 @@
 
 mod compression;
 
-use brotli::enc::backward_references::BrotliEncoderMode;
 use brotli::enc::BrotliEncoderParams;
 use std::io;
 use std::io::Cursor;
@@ -59,10 +58,11 @@ fn b_compress(data: &[u8]) -> PyResult<PyObject> {
     let mut buffer = Cursor::new(data);
     let mut compressed = Vec::new();
 
-    let mut params = BrotliEncoderParams::default();
-    params.quality = 7;
-    params.large_window = true;
-    params.mode = BrotliEncoderMode::BROTLI_MODE_GENERIC;
+    let params = BrotliEncoderParams {
+        quality: 7,
+        large_window: true,
+        ..Default::default()
+    };
 
     match brotli::BrotliCompress(&mut buffer, &mut compressed, &params) {
         Ok(_) => {}
